@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="flight_json" format="json">
+      <types:example format="json" location="examples/flight-example.json"/>
+    </types:type>
+    <types:type name="flights_json" format="json">
+      <types:example format="json" location="examples/flights-example.json"/>
+    </types:type>
+    <types:type name="flights_xml" format="xml">
+      <types:example format="xml" element="{http://soap.training.mulesoft.com/}listAllFlightsResponse" location="examples/flights-example.xml"/>
+    </types:type>
+    <types:type name="accounts_json" format="json">
+      <types:example format="json" location="examples/accounts.json"/>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#3692360d-e00f-40ee-8568-865b9d3fd553">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="flight_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#248334b8-ec59-4ba4-82bd-1264235b06da">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="flights_json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#2f291c5a-4c21-4919-bad1-d4974a9c7f37">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="flights_xml"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#656546bc-6304-456f-bed2-a8a173f2c03d">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="accounts_json"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

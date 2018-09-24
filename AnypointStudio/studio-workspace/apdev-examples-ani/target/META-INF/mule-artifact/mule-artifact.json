@@ -1,0 +1,31 @@
+{
+  "configs": [
+    "dataweave-examples.xml",
+    "accounts.xml",
+    "apdev-examples.xml",
+    "abx.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "apdev-examples",
+  "minMuleVersion": "4.1.1",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [
+        "log4j2.xml",
+        "example.dwl",
+        "application-types.xml",
+        "examples/flights-example.xml",
+        "examples/flight-example.json",
+        "examples/flights-example.json",
+        "examples/accounts.json"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

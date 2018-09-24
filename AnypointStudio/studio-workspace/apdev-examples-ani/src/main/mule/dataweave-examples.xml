@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="dataweave-examplesFlow" doc:id="d6be06e7-1cfa-4d89-8c43-14c74c2c1992" >
+		<http:listener doc:name="POST /simpleJSON" doc:id="3692360d-e00f-40ee-8568-865b9d3fd553" config-ref="HTTP_Listener_config" path="/simplejson" allowedMethods="POST"/>
+		<ee:transform doc:name="Transform Message" doc:id="197060ec-8556-48fe-8a49-0ecff118167a" >
+			<ee:message >
+				<ee:set-payload resource="example.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="dwVar" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="77b0c8f3-0a8f-458c-9648-b3cd82662c11" />
+	</flow>
+	<flow name="JSONArrayDWTransformation" doc:id="3dec4ed3-d89b-4606-90ed-72760c125445" >
+		<http:listener doc:name="Listener" doc:id="248334b8-ec59-4ba4-82bd-1264235b06da" config-ref="HTTP_Listener_config" path="/sample"/>
+		<ee:transform doc:name="Transform Message" doc:id="f6df5ab0-ca3a-45d8-aae1-2d422806b05b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+root : {(payload map (object, index) -> 
+	flight @(index : '$(index)'): {
+	Hub : "MUA",
+	code : ++ (object.airline as String, object.fromAirportCode as String),
+	availableSeats : object.totalSeats as Number - object.emptySeats as Number
+})
+} 
+
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="XMLArrayDWTransformation" doc:id="a8de3d9b-1632-40fc-8367-d9ecb6987d7b" >
+		<http:listener doc:name="Listener" doc:id="2f291c5a-4c21-4919-bad1-d4974a9c7f37" config-ref="HTTP_Listener_config" path="/dw2"/>
+		<ee:transform doc:name="Transform Message" doc:id="4647a8a5-5601-4e54-b379-57e185de3446" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var numSeats = 400
+fun calculateTotalSeats (planeType : String) =
+	if (planeType contains '737') 
+		200
+	else 400
+type Currency = String {format : "###.00"}
+---
+using (flights = payload..*return map (obj, num) -> {
+	airlineName : obj.@airlineName,
+	flightCode : obj.code,
+	destination : obj.destination,
+	totalSeats : calculateTotalSeats(obj.planeType as String),
+	planeType : upper(obj.planeType as String replace /Boing/ with 'Boeing'),
+	price : obj.price as Number as Currency,
+	departureDate : obj.departureDate as Date {format : "yyyy/MM/dd"} as String {format : "dd/MMM/yyyy"},
+	emptySeats : obj.emptySeats as Number
+})
+
+flights filter($.emptySeats != 0)
+		orderBy -$.totalSeats
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
